@@ -23,8 +23,7 @@ package javazoom.jl.decoder;
 /**
  * Exception error codes for components of the JavaLayer API.
  */
-public interface JavaLayerErrors
-{
+public interface JavaLayerErrors {
 	/**
 	 * The first bitstream error code. See the {@link DecoderErrors DecoderErrors}
 	 * interface for other bitstream error codes.

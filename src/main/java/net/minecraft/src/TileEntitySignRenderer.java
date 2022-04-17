@@ -1,86 +1,77 @@
 package net.minecraft.src;
+
+import net.lax1dude.eaglercraft.EaglerAdapter;
+
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode 
 
-import org.lwjgl.opengl.GL11;
 
-public class TileEntitySignRenderer extends TileEntitySpecialRenderer
-{
+public class TileEntitySignRenderer extends TileEntitySpecialRenderer {
 
-    public TileEntitySignRenderer()
-    {
-        signModel = new SignModel();
-    }
+	public TileEntitySignRenderer() {
+		signModel = new SignModel();
+	}
 
-    public void renderTileEntitySignAt(TileEntitySign tileentitysign, double d, double d1, double d2, 
-            float f)
-    {
-        Block block = tileentitysign.getBlockType();
-        GL11.glPushMatrix();
-        float f1 = 0.6666667F;
-        if(block == Block.signPost)
-        {
-            GL11.glTranslatef((float)d + 0.5F, (float)d1 + 0.75F * f1, (float)d2 + 0.5F);
-            float f2 = (float)(tileentitysign.getBlockMetadata() * 360) / 16F;
-            GL11.glRotatef(-f2, 0.0F, 1.0F, 0.0F);
-            signModel.field_1345_b.showModel = true;
-        } else
-        {
-            int i = tileentitysign.getBlockMetadata();
-            float f3 = 0.0F;
-            if(i == 2)
-            {
-                f3 = 180F;
-            }
-            if(i == 4)
-            {
-                f3 = 90F;
-            }
-            if(i == 5)
-            {
-                f3 = -90F;
-            }
-            GL11.glTranslatef((float)d + 0.5F, (float)d1 + 0.75F * f1, (float)d2 + 0.5F);
-            GL11.glRotatef(-f3, 0.0F, 1.0F, 0.0F);
-            GL11.glTranslatef(0.0F, -0.3125F, -0.4375F);
-            signModel.field_1345_b.showModel = false;
-        }
-        bindTextureByName("/item/sign.png");
-        GL11.glPushMatrix();
-        GL11.glScalef(f1, -f1, -f1);
-        signModel.func_887_a();
-        GL11.glPopMatrix();
-        FontRenderer fontrenderer = getFontRenderer();
-        float f4 = 0.01666667F * f1;
-        GL11.glTranslatef(0.0F, 0.5F * f1, 0.07F * f1);
-        GL11.glScalef(f4, -f4, f4);
-        GL11.glNormal3f(0.0F, 0.0F, -1F * f4);
-        GL11.glDepthMask(false);
-        int j = 0;
-        for(int k = 0; k < tileentitysign.signText.length; k++)
-        {
-            String s = tileentitysign.signText[k];
-            if(k == tileentitysign.lineBeingEdited)
-            {
-                s = (new StringBuilder()).append("> ").append(s).append(" <").toString();
-                fontrenderer.drawString(s, -fontrenderer.getStringWidth(s) / 2, k * 10 - tileentitysign.signText.length * 5, j);
-            } else
-            {
-                fontrenderer.drawString(s, -fontrenderer.getStringWidth(s) / 2, k * 10 - tileentitysign.signText.length * 5, j);
-            }
-        }
+	public void renderTileEntitySignAt(TileEntitySign tileentitysign, double d, double d1, double d2, float f) {
+		Block block = tileentitysign.getBlockType();
+		EaglerAdapter.glPushMatrix();
+		float f1 = 0.6666667F;
+		if (block == Block.signPost) {
+			EaglerAdapter.glTranslatef((float) d + 0.5F, (float) d1 + 0.75F * f1, (float) d2 + 0.5F);
+			float f2 = (float) (tileentitysign.getBlockMetadata() * 360) / 16F;
+			EaglerAdapter.glRotatef(-f2, 0.0F, 1.0F, 0.0F);
+			signModel.field_1345_b.showModel = true;
+		} else {
+			int i = tileentitysign.getBlockMetadata();
+			float f3 = 0.0F;
+			if (i == 2) {
+				f3 = 180F;
+			}
+			if (i == 4) {
+				f3 = 90F;
+			}
+			if (i == 5) {
+				f3 = -90F;
+			}
+			EaglerAdapter.glTranslatef((float) d + 0.5F, (float) d1 + 0.75F * f1, (float) d2 + 0.5F);
+			EaglerAdapter.glRotatef(-f3, 0.0F, 1.0F, 0.0F);
+			EaglerAdapter.glTranslatef(0.0F, -0.3125F, -0.4375F);
+			signModel.field_1345_b.showModel = false;
+		}
+		bindTextureByName("/item/sign.png");
+		EaglerAdapter.glPushMatrix();
+		EaglerAdapter.glScalef(f1, -f1, -f1);
+		signModel.func_887_a();
+		EaglerAdapter.glPopMatrix();
+		FontRenderer fontrenderer = getFontRenderer();
+		float f4 = 0.01666667F * f1;
+		EaglerAdapter.glTranslatef(0.0F, 0.5F * f1, 0.07F * f1);
+		EaglerAdapter.glScalef(f4, -f4, f4);
+		EaglerAdapter.glNormal3f(0.0F, 0.0F, -1F * f4);
+		EaglerAdapter.glDepthMask(false);
+		int j = 0;
+		for (int k = 0; k < tileentitysign.signText.length; k++) {
+			String s = tileentitysign.signText[k];
+			if (k == tileentitysign.lineBeingEdited) {
+				s = (new StringBuilder()).append("> ").append(s).append(" <").toString();
+				fontrenderer.drawString(s, -fontrenderer.getStringWidth(s) / 2,
+						k * 10 - tileentitysign.signText.length * 5, j);
+			} else {
+				fontrenderer.drawString(s, -fontrenderer.getStringWidth(s) / 2,
+						k * 10 - tileentitysign.signText.length * 5, j);
+			}
+		}
 
-        GL11.glDepthMask(true);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glPopMatrix();
-    }
+		EaglerAdapter.glDepthMask(true);
+		EaglerAdapter.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		EaglerAdapter.glPopMatrix();
+	}
 
-    public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, 
-            float f)
-    {
-        renderTileEntitySignAt((TileEntitySign)tileentity, d, d1, d2, f);
-    }
+	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f) {
+		renderTileEntitySignAt((TileEntitySign) tileentity, d, d1, d2, f);
+	}
 
-    private SignModel signModel;
+	private SignModel signModel;
 }

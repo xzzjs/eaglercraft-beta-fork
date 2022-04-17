@@ -9,5 +9,5 @@ public class UnexpectedThrowable extends RuntimeException {
 	public UnexpectedThrowable(String str, Throwable t) {
 		super(str, t);
 	}
-	
+
 }

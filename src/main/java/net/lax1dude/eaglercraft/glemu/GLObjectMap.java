@@ -5,7 +5,7 @@ public class GLObjectMap<T> {
 	private int size;
 	private int insertIndex;
 	public int allocatedObjects;
-	
+
 	public GLObjectMap(int initialSize) {
 		this.values = new Object[initialSize];
 		this.size = initialSize;
@@ -17,32 +17,34 @@ public class GLObjectMap<T> {
 		int start = insertIndex;
 		do {
 			++insertIndex;
-			if(insertIndex >= size) {
+			if (insertIndex >= size) {
 				insertIndex = 0;
 			}
-			if(insertIndex == start) {
+			if (insertIndex == start) {
 				resize();
 				return register(obj);
 			}
-		}while(values[insertIndex] != null);
+		} while (values[insertIndex] != null);
 		values[insertIndex] = obj;
 		++allocatedObjects;
 		return insertIndex;
 	}
-	
+
 	public T free(int obj) {
-		if(obj >= size || obj < 0) return null;
+		if (obj >= size || obj < 0)
+			return null;
 		Object ret = values[obj];
 		values[obj] = null;
 		--allocatedObjects;
 		return (T) ret;
 	}
-	
+
 	public T get(int obj) {
-		if(obj >= size || obj < 0) return null;
+		if (obj >= size || obj < 0)
+			return null;
 		return (T) values[obj];
 	}
-	
+
 	private void resize() {
 		int oldSize = size;
 		size += size / 2;

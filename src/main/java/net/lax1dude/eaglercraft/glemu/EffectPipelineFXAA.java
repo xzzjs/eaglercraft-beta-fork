@@ -12,7 +12,7 @@ import static net.lax1dude.eaglercraft.adapter.EaglerAdapterImpl2._wglDisable;
 import static net.lax1dude.eaglercraft.glemu.EaglerAdapterGL30.*;
 
 public class EffectPipelineFXAA {
-	
+
 	private static boolean isUsingFXAA = false;
 
 	private static FramebufferGL framebuffer = null;
@@ -22,7 +22,7 @@ public class EffectPipelineFXAA {
 	private static ProgramGL fxaaProgram = null;
 	private static TextureGL fxaaSourceTexture = null;
 	private static UniformGL fxaaScreenSize = null;
-	
+
 	private static BufferArrayGL renderQuadArray = null;
 	private static BufferGL renderQuadBuffer;
 
@@ -36,40 +36,51 @@ public class EffectPipelineFXAA {
 	private static int state = 1;
 	private static int newState = -1;
 	private static boolean msaaInit = false;
-	
+
 	private static void initFXAA() {
-		if(fxaaProgram == null) {
+		if (fxaaProgram == null) {
 			renderQuadArray = _wglCreateVertexArray();
 			renderQuadBuffer = _wglCreateBuffer();
-			
-			IntBuffer upload = (isWebGL ? IntBuffer.wrap(new int[12]) : ByteBuffer.allocateDirect(12 << 2).order(ByteOrder.nativeOrder()).asIntBuffer());
-			upload.put(Float.floatToRawIntBits(0.0f)); upload.put(Float.floatToRawIntBits(0.0f));
-			upload.put(Float.floatToRawIntBits(0.0f)); upload.put(Float.floatToRawIntBits(1.0f));
-			upload.put(Float.floatToRawIntBits(1.0f)); upload.put(Float.floatToRawIntBits(0.0f));
-			upload.put(Float.floatToRawIntBits(0.0f)); upload.put(Float.floatToRawIntBits(1.0f));
-			upload.put(Float.floatToRawIntBits(1.0f)); upload.put(Float.floatToRawIntBits(1.0f));
-			upload.put(Float.floatToRawIntBits(1.0f)); upload.put(Float.floatToRawIntBits(0.0f));
+
+			IntBuffer upload = (isWebGL ? IntBuffer.wrap(new int[12])
+					: ByteBuffer.allocateDirect(12 << 2).order(ByteOrder.nativeOrder()).asIntBuffer());
+			upload.put(Float.floatToRawIntBits(0.0f));
+			upload.put(Float.floatToRawIntBits(0.0f));
+			upload.put(Float.floatToRawIntBits(0.0f));
+			upload.put(Float.floatToRawIntBits(1.0f));
+			upload.put(Float.floatToRawIntBits(1.0f));
+			upload.put(Float.floatToRawIntBits(0.0f));
+			upload.put(Float.floatToRawIntBits(0.0f));
+			upload.put(Float.floatToRawIntBits(1.0f));
+			upload.put(Float.floatToRawIntBits(1.0f));
+			upload.put(Float.floatToRawIntBits(1.0f));
+			upload.put(Float.floatToRawIntBits(1.0f));
+			upload.put(Float.floatToRawIntBits(0.0f));
 			upload.flip();
-			
+
 			_wglBindVertexArray(renderQuadArray);
 			_wglBindBuffer(_wGL_ARRAY_BUFFER, renderQuadBuffer);
 			_wglBufferData0(_wGL_ARRAY_BUFFER, upload, _wGL_STATIC_DRAW);
 			_wglEnableVertexAttribArray(0);
 			_wglVertexAttribPointer(0, 2, _wGL_FLOAT, false, 8, 0);
-			
+
 			ShaderGL pvert_shader = _wglCreateShader(_wGL_VERTEX_SHADER);
 
 			_wglShaderSource(pvert_shader, _wgetShaderHeader() + "\n" + fileContents("/glsl/pvert.glsl"));
 			_wglCompileShader(pvert_shader);
 
-			if (!_wglGetShaderCompiled(pvert_shader)) System.err.println(("\n" + _wglGetShaderInfoLog(pvert_shader)).replace("\n", "\n[/glsl/pvert.glsl] ") + "\n");
-			
+			if (!_wglGetShaderCompiled(pvert_shader))
+				System.err.println(
+						("\n" + _wglGetShaderInfoLog(pvert_shader)).replace("\n", "\n[/glsl/pvert.glsl] ") + "\n");
+
 			ShaderGL fxaa_shader = _wglCreateShader(_wGL_FRAGMENT_SHADER);
 			_wglShaderSource(fxaa_shader, _wgetShaderHeader() + "\n" + fileContents("/glsl/fxaa.glsl"));
 			_wglCompileShader(fxaa_shader);
-			
-			if (!_wglGetShaderCompiled(fxaa_shader)) System.err.println(("\n" + _wglGetShaderInfoLog(fxaa_shader)).replace("\n", "\n[/glsl/fxaa.glsl] ") + "\n");
-			
+
+			if (!_wglGetShaderCompiled(fxaa_shader))
+				System.err.println(
+						("\n" + _wglGetShaderInfoLog(fxaa_shader)).replace("\n", "\n[/glsl/fxaa.glsl] ") + "\n");
+
 			fxaaProgram = _wglCreateProgram();
 			_wglAttachShader(fxaaProgram, pvert_shader);
 			_wglAttachShader(fxaaProgram, fxaa_shader);
@@ -78,44 +89,47 @@ public class EffectPipelineFXAA {
 			_wglDetachShader(fxaaProgram, fxaa_shader);
 			_wglDeleteShader(pvert_shader);
 			_wglDeleteShader(fxaa_shader);
-			
-			if(!_wglGetProgramLinked(fxaaProgram)) {
-				System.err.println(("\n"+_wglGetProgramInfoLog(fxaaProgram)).replace("\n", "\n[/glsl/fxaa.glsl][LINKER] ") + "\n");
+
+			if (!_wglGetProgramLinked(fxaaProgram)) {
+				System.err.println(
+						("\n" + _wglGetProgramInfoLog(fxaaProgram)).replace("\n", "\n[/glsl/fxaa.glsl][LINKER] ")
+								+ "\n");
 				fxaaProgram = null;
 				throw new RuntimeException("Invalid shader code");
 			}
-			
+
 			_wglUseProgram(fxaaProgram);
-			
+
 			UniformGL c = _wglGetUniformLocation(fxaaProgram, "f_color");
-			if(c != null) _wglUniform1i(c, 0);
-			
+			if (c != null)
+				_wglUniform1i(c, 0);
+
 			fxaaScreenSize = _wglGetUniformLocation(fxaaProgram, "screenSize");
 		}
-		
+
 		destroy();
-		
+
 		isUsingFXAA = true;
 		framebuffer = _wglCreateFramebuffer();
 		fxaaSourceTexture = _wglGenTextures();
-		
+
 		_wglBindTexture(_wGL_TEXTURE_2D, fxaaSourceTexture);
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MAG_FILTER, _wGL_NEAREST);
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_MIN_FILTER, _wGL_NEAREST);
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_S, _wGL_CLAMP);
 		_wglTexParameteri(_wGL_TEXTURE_2D, _wGL_TEXTURE_WRAP_T, _wGL_CLAMP);
-		_wglTexImage2D(_wGL_TEXTURE_2D, 0, _wGL_RGB8, width, height, 0, _wGL_RGB, _wGL_UNSIGNED_BYTE, (ByteBuffer)null);
-		
-		
+		_wglTexImage2D(_wGL_TEXTURE_2D, 0, _wGL_RGB8, width, height, 0, _wGL_RGB, _wGL_UNSIGNED_BYTE,
+				(ByteBuffer) null);
+
 		framebuffer_depth = _wglCreateRenderBuffer();
 		_wglBindRenderbuffer(framebuffer_depth);
 		_wglRenderbufferStorage(_wGL_DEPTH_COMPONENT32F, width, height);
-		
+
 		_wglBindFramebuffer(_wGL_FRAMEBUFFER, framebuffer);
 		_wglFramebufferTexture2D(_wGL_COLOR_ATTACHMENT0, fxaaSourceTexture);
 		_wglFramebufferRenderbuffer(_wGL_DEPTH_ATTACHMENT, framebuffer_depth);
 	}
-	
+
 	private static void initMSAA() {
 		destroy();
 		msaaInit = true;
@@ -130,14 +144,18 @@ public class EffectPipelineFXAA {
 		_wglFramebufferRenderbuffer(_wGL_COLOR_ATTACHMENT0, framebuffer_color);
 		_wglFramebufferRenderbuffer(_wGL_DEPTH_ATTACHMENT, framebuffer_depth);
 	}
-	
+
 	public static void destroy() {
 		isUsingFXAA = false;
 		msaaInit = false;
-		if(framebuffer != null) _wglDeleteFramebuffer(framebuffer);
-		if(framebuffer_color != null) _wglDeleteRenderbuffer(framebuffer_color);
-		if(framebuffer_depth != null) _wglDeleteRenderbuffer(framebuffer_depth);
-		if(fxaaSourceTexture != null) _wglDeleteTextures(fxaaSourceTexture);
+		if (framebuffer != null)
+			_wglDeleteFramebuffer(framebuffer);
+		if (framebuffer_color != null)
+			_wglDeleteRenderbuffer(framebuffer_color);
+		if (framebuffer_depth != null)
+			_wglDeleteRenderbuffer(framebuffer_depth);
+		if (fxaaSourceTexture != null)
+			_wglDeleteTextures(fxaaSourceTexture);
 		framebuffer = null;
 		framebuffer_color = null;
 		framebuffer_depth = null;
@@ -145,24 +163,29 @@ public class EffectPipelineFXAA {
 	}
 
 	public static void beginPipelineRender() {
-		if(displayWidth <= 0 || displayHeight <= 0) {
+		if (displayWidth <= 0 || displayHeight <= 0) {
 			return;
 		}
-		int mode = 1; //Minecraft.getMinecraft().gameSettings.antialiasMode; //TODO: add
-		if(mode == 0) newState = 0;
-		if(mode == 1) newState = Minecraft.getMinecraft().gameSettings.fancyGraphics ? 1 : 0;
-		if(mode == 2) newState = 1;
-		if(mode == 3) newState = 2;
-		if(mode == 4) newState = 3;
-		if(newState == 0) {
+		int mode = 1; // Minecraft.getMinecraft().gameSettings.antialiasMode; //TODO: add
+		if (mode == 0)
+			newState = 0;
+		if (mode == 1)
+			newState = Minecraft.getMinecraft().gameSettings.fancyGraphics ? 1 : 0;
+		if (mode == 2)
+			newState = 1;
+		if (mode == 3)
+			newState = 2;
+		if (mode == 4)
+			newState = 3;
+		if (newState == 0) {
 			state = newState;
 			destroy();
 			return;
 		}
-		if(newState != state && !(newState == 3 && state == 2)) {
+		if (newState != state && !(newState == 3 && state == 2)) {
 			destroy();
 		}
-		//_wglGetParameter(_wGL_VIEWPORT, 4, originalViewport);
+		// _wglGetParameter(_wGL_VIEWPORT, 4, originalViewport);
 		if (displayWidth != width || displayHeight != height || state != newState) {
 			state = newState;
 			width = displayWidth;
@@ -171,19 +194,20 @@ public class EffectPipelineFXAA {
 			originalViewport[1] = 0;
 			originalViewport[2] = width;
 			originalViewport[3] = height;
-			if(state == 1) {
-				if(isUsingFXAA == false) {
+			if (state == 1) {
+				if (isUsingFXAA == false) {
 					initFXAA();
-				}else {
+				} else {
 					_wglBindTexture(_wGL_TEXTURE_2D, fxaaSourceTexture);
-					_wglTexImage2D(_wGL_TEXTURE_2D, 0, _wGL_RGB8, width, height, 0, _wGL_RGB, _wGL_UNSIGNED_BYTE, (ByteBuffer)null);
+					_wglTexImage2D(_wGL_TEXTURE_2D, 0, _wGL_RGB8, width, height, 0, _wGL_RGB, _wGL_UNSIGNED_BYTE,
+							(ByteBuffer) null);
 					_wglBindRenderbuffer(framebuffer_depth);
 					_wglRenderbufferStorage(_wGL_DEPTH_COMPONENT32F, width, height);
 				}
-			}else if(state == 2 || state == 3) {
-				if(msaaInit == false) {
+			} else if (state == 2 || state == 3) {
+				if (msaaInit == false) {
 					initMSAA();
-				}else {
+				} else {
 					_wglBindRenderbuffer(framebuffer_color);
 					_wglRenderbufferStorageMultisample(state == 2 ? 4 : 8, _wGL_RGB8, width, height);
 					_wglBindRenderbuffer(framebuffer_depth);
@@ -193,19 +217,19 @@ public class EffectPipelineFXAA {
 		}
 		_wglBindFramebuffer(_wGL_FRAMEBUFFER, framebuffer);
 		_wglViewport(0, 0, width, height);
-		if(!EaglerAdapter.isWebGL && (state == 2 || state == 3)) {
+		if (!EaglerAdapter.isWebGL && (state == 2 || state == 3)) {
 			_wglEnable(_wGL_MULTISAMPLE);
 			_wglEnable(_wGL_LINE_SMOOTH);
 		}
 	}
 
 	public static void endPipelineRender() {
-		if(displayWidth <= 0 || displayHeight <= 0 || state == 0) {
+		if (displayWidth <= 0 || displayHeight <= 0 || state == 0) {
 			return;
 		}
 		_wglBindFramebuffer(_wGL_FRAMEBUFFER, null);
 		_wglClear(_wGL_COLOR_BUFFER_BIT | _wGL_DEPTH_BUFFER_BIT);
-		if(state == 1) {
+		if (state == 1) {
 			_wglViewport(originalViewport[0], originalViewport[1], originalViewport[2], originalViewport[3]);
 			_wglActiveTexture(_wGL_TEXTURE0);
 			_wglBindTexture(_wGL_TEXTURE_2D, fxaaSourceTexture);
@@ -218,8 +242,8 @@ public class EffectPipelineFXAA {
 			_wglDrawArrays(_wGL_TRIANGLES, 0, 6);
 			_wglEnable(_wGL_DEPTH_TEST);
 			_wglDepthMask(true);
-		}else if(state == 2 || state == 3) {
-			if(!EaglerAdapter.isWebGL) {
+		} else if (state == 2 || state == 3) {
+			if (!EaglerAdapter.isWebGL) {
 				_wglDisable(_wGL_MULTISAMPLE);
 				_wglDisable(_wGL_LINE_SMOOTH);
 			}
@@ -231,5 +255,5 @@ public class EffectPipelineFXAA {
 			_wglBindFramebuffer(_wGL_READ_FRAMEBUFFER, null);
 		}
 	}
-	
+
 }

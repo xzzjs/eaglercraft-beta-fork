@@ -27,7 +27,6 @@ public class Tessellator {
 
 	/** The second coordinate to be used for the texture. */
 	private double textureV;
-	private int brightness;
 
 	/** The color (RGBA) value to be used for the following draw call. */
 	private int color;
@@ -41,7 +40,6 @@ public class Tessellator {
 	 * Whether the current draw object for this tessellator has texture coordinates.
 	 */
 	private boolean hasTexture = false;
-	private boolean hasBrightness = false;
 
 	/**
 	 * Whether the current draw object for this tessellator has normal values.
@@ -101,10 +99,10 @@ public class Tessellator {
 		this.rawBuffer = new int[par1];
 		this.useVBO = false;// tryVBO && GLContext.getCapabilities().GL_ARB_vertex_buffer_object;
 
-		//if (this.useVBO) {
-			//this.vertexBuffers = GLAllocation.createDirectIntBuffer(this.vboCount);
-			//ARBVertexBufferObject.glGenBuffersARB(this.vertexBuffers);
-		//}
+		// if (this.useVBO) {
+		// this.vertexBuffers = GLAllocation.createDirectIntBuffer(this.vboCount);
+		// ARBVertexBufferObject.glGenBuffersARB(this.vertexBuffers);
+		// }
 	}
 
 	/**
@@ -136,14 +134,8 @@ public class Tessellator {
 					EaglerAdapter.glEnableVertexAttrib(EaglerAdapter.GL_NORMAL_ARRAY);
 				}
 
-				if (this.hasBrightness) {
-					EaglerAdapter.glClientActiveTexture(EaglerAdapter.GL_TEXTURE1);
-					EaglerAdapter.glEnableVertexAttrib(EaglerAdapter.GL_TEXTURE_COORD_ARRAY);
-					EaglerAdapter.glClientActiveTexture(EaglerAdapter.GL_TEXTURE0);
-				}
-				
 				EaglerAdapter.glDrawArrays(this.drawMode, 0, this.vertexCount, up);
-				
+
 				if (this.hasTexture) {
 					EaglerAdapter.glDisableVertexAttrib(EaglerAdapter.GL_TEXTURE_COORD_ARRAY);
 				}
@@ -154,12 +146,6 @@ public class Tessellator {
 
 				if (this.hasNormals) {
 					EaglerAdapter.glDisableVertexAttrib(EaglerAdapter.GL_NORMAL_ARRAY);
-				}
-
-				if (this.hasBrightness) {
-					EaglerAdapter.glClientActiveTexture(EaglerAdapter.GL_TEXTURE1);
-					EaglerAdapter.glDisableVertexAttrib(EaglerAdapter.GL_TEXTURE_COORD_ARRAY);
-					EaglerAdapter.glClientActiveTexture(EaglerAdapter.GL_TEXTURE0);
 				}
 			}
 
@@ -199,7 +185,6 @@ public class Tessellator {
 		this.hasNormals = false;
 		this.hasColor = false;
 		this.hasTexture = false;
-		this.hasBrightness = false;
 		this.isColorDisabled = false;
 	}
 
@@ -210,11 +195,6 @@ public class Tessellator {
 		this.hasTexture = true;
 		this.textureU = par1;
 		this.textureV = par3;
-	}
-
-	public void setBrightness(int par1) {
-		this.hasBrightness = true;
-		this.brightness = par1;
 	}
 
 	/**
@@ -295,9 +275,10 @@ public class Tessellator {
 	 * trigger a draw() if the buffer gets full.
 	 */
 	public void addVertex(double par1, double par3, double par5) {
-		if(this.addedVertices > 65534) return;
+		if (this.addedVertices > 65534)
+			return;
 		++this.addedVertices;
-		
+
 		this.rawBuffer[this.rawBufferIndex + 0] = Float.floatToRawIntBits((float) (par1 + this.xOffset));
 		this.rawBuffer[this.rawBufferIndex + 1] = Float.floatToRawIntBits((float) (par3 + this.yOffset));
 		this.rawBuffer[this.rawBufferIndex + 2] = Float.floatToRawIntBits((float) (par5 + this.zOffset));
@@ -315,11 +296,7 @@ public class Tessellator {
 			this.rawBuffer[this.rawBufferIndex + 6] = this.normal;
 		}
 
-		if (this.hasBrightness) {
-			this.rawBuffer[this.rawBufferIndex + 7] = this.brightness;
-		}
-
-		this.rawBufferIndex += 8;
+		this.rawBufferIndex += 7;
 		++this.vertexCount;
 	}
 
@@ -358,16 +335,16 @@ public class Tessellator {
 	public void setNormal(float par1, float par2, float par3) {
 		this.hasNormals = true;
 		float len = (float) Math.sqrt(par1 * par1 + par2 * par2 + par3 * par3);
-		int var4 = (int)((par1 / len) * 127.0F) + 127;
-		int var5 = (int)((par2 / len) * 127.0F) + 127;
-		int var6 = (int)((par3 / len) * 127.0F) + 127;
+		int var4 = (int) ((par1 / len) * 127.0F) + 127;
+		int var5 = (int) ((par2 / len) * 127.0F) + 127;
+		int var6 = (int) ((par3 / len) * 127.0F) + 127;
 		this.normal = var4 & 255 | (var5 & 255) << 8 | (var6 & 255) << 16;
 	}
 
 	/**
 	 * Sets the translation for all vertices in the current draw call.
 	 */
-	public void setTranslation(double par1, double par3, double par5) {
+	public void setTranslationD(double par1, double par3, double par5) {
 		this.xOffset = par1;
 		this.yOffset = par3;
 		this.zOffset = par5;
@@ -376,7 +353,7 @@ public class Tessellator {
 	/**
 	 * Offsets the translation for all vertices in the current draw call.
 	 */
-	public void addTranslation(float par1, float par2, float par3) {
+	public void setTranslationF(float par1, float par2, float par3) {
 		this.xOffset += (double) par1;
 		this.yOffset += (double) par2;
 		this.zOffset += (double) par3;

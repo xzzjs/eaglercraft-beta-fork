@@ -24,23 +24,20 @@ package javazoom.jl.decoder;
  * 
  * Manages a number of controls.
  */
-public class Manager //implements Control
+public class Manager // implements Control
 {
-	public void addControl(Control c)
-	{
-		
+	public void addControl(Control c) {
+
 	}
-	
-	public void removeControl(Control c)
-	{
-		
+
+	public void removeControl(Control c) {
+
 	}
-	
-	public void removeAll()
-	{
-		
+
+	public void removeAll() {
+
 	}
-	
+
 	// control interface delegates to a managed control
-	
+
 }

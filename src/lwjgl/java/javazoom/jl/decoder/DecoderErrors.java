@@ -22,22 +22,21 @@
 package javazoom.jl.decoder;
 
 /**
- * This interface provides constants describing the error
- * codes used by the Decoder to indicate errors. 
+ * This interface provides constants describing the error codes used by the
+ * Decoder to indicate errors.
  * 
- * @author	MDM
+ * @author MDM
  */
-public interface DecoderErrors extends JavaLayerErrors
-{
-	
+public interface DecoderErrors extends JavaLayerErrors {
+
 	public static final int UNKNOWN_ERROR = DECODER_ERROR + 0;
-	
+
 	/**
-	 * Layer not supported by the decoder. 
+	 * Layer not supported by the decoder.
 	 */
 	public static final int UNSUPPORTED_LAYER = DECODER_ERROR + 1;
 
-    /**
+	/**
 	 * Illegal allocation in subband layer. Indicates a corrupt stream.
 	 */
 	public static final int ILLEGAL_SUBBAND_ALLOCATION = DECODER_ERROR + 2;

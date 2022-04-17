@@ -42,8 +42,7 @@ import javazoom.jl.decoder.Obuffer;
 /**
  * Main decoder.
  */
-public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInputStream
-{
+public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInputStream {
 	private InputStream m_encodedStream;
 	private Bitstream m_bitstream;
 	private Decoder m_decoder;
@@ -58,17 +57,13 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
 	private long currentFrame = 0;
 	private int currentFramesize = 0;
 
-	public DecodedMpegAudioInputStream(AudioFormat outputFormat,
-			AudioInputStream bufferedInputStream)
-	{
+	public DecodedMpegAudioInputStream(AudioFormat outputFormat, AudioInputStream bufferedInputStream) {
 		super(outputFormat, -1);
 
-		try
-		{
+		try {
 			// Try to find out inputstream length to allow skip.
 			byteslength = bufferedInputStream.available();
-		} catch (IOException e)
-		{
+		} catch (IOException e) {
 			byteslength = -1;
 		}
 		m_encodedStream = bufferedInputStream;
@@ -83,13 +78,11 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
 		// m_decoder.setEqualizer(m_equalizer);
 		m_oBuffer = new DMAISObuffer(outputFormat.getChannels());
 		m_decoder.setOutputBuffer(m_oBuffer);
-		try
-		{
+		try {
 			m_header = m_bitstream.readFrame();
-			if((m_header != null) && (frameslength == -1) && (byteslength > 0))
+			if ((m_header != null) && (frameslength == -1) && (byteslength > 0))
 				frameslength = m_header.max_number_of_frames((int) byteslength);
-		} catch (BitstreamException e)
-		{
+		} catch (BitstreamException e) {
 
 			byteslength = -1;
 		}
@@ -99,16 +92,15 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
 	// reverseBytes( smallBuffer, 0, bytesRead );
 	{
 
-		try
-		{
+		try {
 			// Following line hangs when FrameSize is available in AudioFormat.
 			Header header = null;
-			if(m_header == null)
+			if (m_header == null)
 				header = m_bitstream.readFrame();
-			else header = m_header;
+			else
+				header = m_header;
 
-			if(header == null)
-			{
+			if (header == null) {
 
 				getCircularBuffer().close();
 				return;
@@ -121,57 +113,49 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
 			m_bitstream.closeFrame();
 			getCircularBuffer().write(m_oBuffer.getBuffer(), 0, m_oBuffer.getCurrentBufferSize());
 			m_oBuffer.reset();
-			if(m_header != null)
+			if (m_header != null)
 				m_header = null;
-		} catch (BitstreamException e)
-		{
+		} catch (BitstreamException e) {
 
-		} catch (DecoderException e)
-		{
+		} catch (DecoderException e) {
 
 		}
 
 	}
 
-	public long skip(long bytes)
-	{
-		if((byteslength > 0) && (frameslength > 0))
-		{
+	public long skip(long bytes) {
+		if ((byteslength > 0) && (frameslength > 0)) {
 			float ratio = bytes * 1.0f / byteslength * 1.0f;
 			long bytesread = skipFrames((long) (ratio * frameslength));
 			currentByte = currentByte + bytesread;
 			m_header = null;
 			return bytesread;
-		} else return -1;
+		} else
+			return -1;
 	}
 
 	/**
-	 * Skip frames. You don't need to call it severals times, it will exactly
-	 * skip given frames number.
+	 * Skip frames. You don't need to call it severals times, it will exactly skip
+	 * given frames number.
 	 * 
 	 * @param frames
 	 * @return bytes length skipped matching to frames skipped.
 	 */
-	public long skipFrames(long frames)
-	{
+	public long skipFrames(long frames) {
 
 		int framesRead = 0;
 		int bytesReads = 0;
-		try
-		{
-			for(int i = 0; i < frames; i++)
-			{
+		try {
+			for (int i = 0; i < frames; i++) {
 				Header header = m_bitstream.readFrame();
-				if(header != null)
-				{
+				if (header != null) {
 					int fsize = header.calculate_framesize();
 					bytesReads = bytesReads + fsize;
 				}
 				m_bitstream.closeFrame();
 				framesRead++;
 			}
-		} catch (BitstreamException e)
-		{
+		} catch (BitstreamException e) {
 
 		}
 
@@ -179,26 +163,22 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
 		return bytesReads;
 	}
 
-	private boolean isBigEndian()
-	{
+	private boolean isBigEndian() {
 		return getFormat().isBigEndian();
 	}
 
-	public void close() throws IOException
-	{
+	public void close() throws IOException {
 		super.close();
 		m_encodedStream.close();
 	}
 
-	private class DMAISObuffer extends Obuffer
-	{
+	private class DMAISObuffer extends Obuffer {
 		private int m_nChannels;
 		private byte[] m_abBuffer;
 		private int[] m_anBufferPointers;
 		private boolean m_bIsBigEndian;
 
-		public DMAISObuffer(int nChannels)
-		{
+		public DMAISObuffer(int nChannels) {
 			m_nChannels = nChannels;
 			m_abBuffer = new byte[OBUFFERSIZE * nChannels];
 			m_anBufferPointers = new int[nChannels];
@@ -206,12 +186,10 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
 			m_bIsBigEndian = DecodedMpegAudioInputStream.this.isBigEndian();
 		}
 
-		public void append(int nChannel, short sValue)
-		{
+		public void append(int nChannel, short sValue) {
 			byte bFirstByte;
 			byte bSecondByte;
-			if(m_bIsBigEndian)
-			{
+			if (m_bIsBigEndian) {
 				bFirstByte = (byte) ((sValue >>> 8) & 0xFF);
 				bSecondByte = (byte) (sValue & 0xFF);
 			} else
@@ -225,36 +203,28 @@ public class DecodedMpegAudioInputStream extends TAsynchronousFilteredAudioInput
 			m_anBufferPointers[nChannel] += m_nChannels * 2;
 		}
 
-		public void set_stop_flag()
-		{
+		public void set_stop_flag() {
 		}
 
-		public void close()
-		{
+		public void close() {
 		}
 
-		public void write_buffer(int nValue)
-		{
+		public void write_buffer(int nValue) {
 		}
 
-		public void clear_buffer()
-		{
+		public void clear_buffer() {
 		}
 
-		public byte[] getBuffer()
-		{
+		public byte[] getBuffer() {
 			return m_abBuffer;
 		}
 
-		public int getCurrentBufferSize()
-		{
+		public int getCurrentBufferSize() {
 			return m_anBufferPointers[0];
 		}
 
-		public void reset()
-		{
-			for(int i = 0; i < m_nChannels; i++)
-			{
+		public void reset() {
+			for (int i = 0; i < m_nChannels; i++) {
 				/*
 				 * Points to byte location, implicitely assuming 16 bit samples.
 				 */

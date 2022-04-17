@@ -42,14 +42,37 @@ public class ProfileUUID {
 		this.lsb = leastSigBits;
 	}
 
-	private static byte long7(long x) { return (byte)(x >> 56); }
-	private static byte long6(long x) { return (byte)(x >> 48); }
-	private static byte long5(long x) { return (byte)(x >> 40); }
-	private static byte long4(long x) { return (byte)(x >> 32); }
-	private static byte long3(long x) { return (byte)(x >> 24); }
-	private static byte long2(long x) { return (byte)(x >> 16); }
-	private static byte long1(long x) { return (byte)(x >>  8); }
-	private static byte long0(long x) { return (byte)(x      ); }
+	private static byte long7(long x) {
+		return (byte) (x >> 56);
+	}
+
+	private static byte long6(long x) {
+		return (byte) (x >> 48);
+	}
+
+	private static byte long5(long x) {
+		return (byte) (x >> 40);
+	}
+
+	private static byte long4(long x) {
+		return (byte) (x >> 32);
+	}
+
+	private static byte long3(long x) {
+		return (byte) (x >> 24);
+	}
+
+	private static byte long2(long x) {
+		return (byte) (x >> 16);
+	}
+
+	private static byte long1(long x) {
+		return (byte) (x >> 8);
+	}
+
+	private static byte long0(long x) {
+		return (byte) (x);
+	}
 
 	public byte[] getBytes() {
 		byte[] ret = new byte[16];
@@ -74,8 +97,8 @@ public class ProfileUUID {
 
 	@Override
 	public String toString() {
-		return (digits(msb >> 32, 8) + "-" + digits(msb >> 16, 4) + "-" + digits(msb, 4) + "-"
-				+ digits(lsb >> 48, 4) + "-" + digits(lsb, 12));
+		return (digits(msb >> 32, 8) + "-" + digits(msb >> 16, 4) + "-" + digits(msb, 4) + "-" + digits(lsb >> 48, 4)
+				+ "-" + digits(lsb, 12));
 	}
 
 	private static String digits(long val, int digits) {
@@ -88,10 +111,10 @@ public class ProfileUUID {
 		long hilo = msb ^ lsb;
 		return ((int) (hilo >> 32)) ^ (int) hilo;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
-		return (o instanceof ProfileUUID) && ((ProfileUUID)o).lsb == lsb && ((ProfileUUID)o).msb == msb;
+		return (o instanceof ProfileUUID) && ((ProfileUUID) o).lsb == lsb && ((ProfileUUID) o).msb == msb;
 	}
 
 }

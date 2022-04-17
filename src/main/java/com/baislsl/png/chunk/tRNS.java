@@ -12,7 +12,7 @@ public class tRNS extends Chunk {
 	}
 
 	public int getAlpha() {
-		return (int)data[0] & 0xFF;
+		return (int) data[0] & 0xFF;
 	}
 
 }

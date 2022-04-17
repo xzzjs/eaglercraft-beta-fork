@@ -1,76 +1,65 @@
 package net.minecraft.src;
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode 
 
 import java.nio.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.lwjgl.opengl.GL11;
 
-public class GLAllocation
-{
+import net.lax1dude.eaglercraft.EaglerAdapter;
 
-    public GLAllocation()
-    {
-    }
+public class GLAllocation {
 
-    public static synchronized int generateDisplayLists(int i)
-    {
-        int j = GL11.glGenLists(i);
-        displayLists.add(Integer.valueOf(j));
-        displayLists.add(Integer.valueOf(i));
-        return j;
-    }
+	public GLAllocation() {
+	}
 
-    public static synchronized void generateTextureNames(IntBuffer intbuffer)
-    {
-        GL11.glGenTextures(intbuffer);
-        for(int i = intbuffer.position(); i < intbuffer.limit(); i++)
-        {
-            textureNames.add(Integer.valueOf(intbuffer.get(i)));
-        }
+	public static synchronized int generateDisplayLists(int i) {
+		int j = EaglerAdapter.glGenLists(i);
+		displayLists.add(Integer.valueOf(j));
+		displayLists.add(Integer.valueOf(i));
+		return j;
+	}
 
-    }
+	public static synchronized void generateTextureNames(IntBuffer intbuffer) {
+		
+		for (int i = intbuffer.position(); i < intbuffer.limit(); i++) {
+			int tx = EaglerAdapter.glGenTextures();
+			intbuffer.put(i, tx);
+			textureNames.add(Integer.valueOf(tx));
+		}
 
-    public static synchronized void deleteTexturesAndDisplayLists()
-    {
-        for(int i = 0; i < displayLists.size(); i += 2)
-        {
-            GL11.glDeleteLists(((Integer)displayLists.get(i)).intValue(), ((Integer)displayLists.get(i + 1)).intValue());
-        }
+	}
 
-        IntBuffer intbuffer = createDirectIntBuffer(textureNames.size());
-        intbuffer.flip();
-        GL11.glDeleteTextures(intbuffer);
-        for(int j = 0; j < textureNames.size(); j++)
-        {
-            intbuffer.put(((Integer)textureNames.get(j)).intValue());
-        }
+	public static synchronized void deleteTexturesAndDisplayLists() {
+		for (int i = 0; i < displayLists.size(); i += 2) {
+			EaglerAdapter.glDeleteLists(((Integer) displayLists.get(i)).intValue(),
+					((Integer) displayLists.get(i + 1)).intValue());
+		}
+		
+		for (int j = 0; j < textureNames.size(); j++) {
+			EaglerAdapter.glDeleteTextures(((Integer) textureNames.get(j)).intValue());
+		}
+		
+		displayLists.clear();
+		textureNames.clear();
+	}
 
-        intbuffer.flip();
-        GL11.glDeleteTextures(intbuffer);
-        displayLists.clear();
-        textureNames.clear();
-    }
+	public static synchronized ByteBuffer createDirectByteBuffer(int i) {
+		ByteBuffer bytebuffer = ByteBuffer.allocateDirect(i).order(ByteOrder.nativeOrder());
+		return bytebuffer;
+	}
 
-    public static synchronized ByteBuffer createDirectByteBuffer(int i)
-    {
-        ByteBuffer bytebuffer = ByteBuffer.allocateDirect(i).order(ByteOrder.nativeOrder());
-        return bytebuffer;
-    }
+	public static IntBuffer createDirectIntBuffer(int i) {
+		return createDirectByteBuffer(i << 2).asIntBuffer();
+	}
 
-    public static IntBuffer createDirectIntBuffer(int i)
-    {
-        return createDirectByteBuffer(i << 2).asIntBuffer();
-    }
+	public static FloatBuffer createDirectFloatBuffer(int i) {
+		return createDirectByteBuffer(i << 2).asFloatBuffer();
+	}
 
-    public static FloatBuffer createDirectFloatBuffer(int i)
-    {
-        return createDirectByteBuffer(i << 2).asFloatBuffer();
-    }
-
-    private static List displayLists = new ArrayList();
-    private static List textureNames = new ArrayList();
+	private static List displayLists = new ArrayList();
+	private static List textureNames = new ArrayList();
 
 }

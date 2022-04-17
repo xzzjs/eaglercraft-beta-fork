@@ -20,7 +20,7 @@ public class PNG {
 
 	public PNG() {
 	}
-	
+
 	public boolean isAlpha() {
 		return this.trns != null || ihdr.getBpp() == 4;
 	}
@@ -67,7 +67,7 @@ public class PNG {
 					int pi = (data[i][j / gap] >> (b * bitDepth)) & a;
 					if (trns != null && trns.getAlpha() == pi) {
 						colors[idx] = 0;
-					}else {
+					} else {
 						colors[idx] = plte.getColor(pi);
 					}
 					break;

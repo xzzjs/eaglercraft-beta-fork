@@ -40,8 +40,9 @@ public final class SpawnerAnimals {
 		object = world.func_22137_s();
 		for (EnumCreatureType enumCreatureType : EnumCreatureType.values()) {
 			if (enumCreatureType.func_21168_d() && !bl2 || !enumCreatureType.func_21168_d() && !bl
-					|| world.countEntities(enumCreatureType.getCreatureClass()) > enumCreatureType.getMaxNumberOfCreature()
-							* field_6544_a.size() / 256)
+					|| world.countEntities(
+							enumCreatureType.getCreatureClass()) > enumCreatureType.getMaxNumberOfCreature()
+									* field_6544_a.size() / 256)
 				continue;
 			block6: for (ChunkCoordIntPair chunkCoordIntPair : field_6544_a) {
 				MobSpawnerBase mobSpawnerBase = world.getWorldChunkManager().func_4074_a(chunkCoordIntPair);
@@ -54,7 +55,8 @@ public final class SpawnerAnimals {
 				int n6 = chunkPosition.x;
 				int n7 = chunkPosition.y;
 				int n8 = chunkPosition.z;
-				if (world.isBlockOpaqueCube(n6, n7, n8) || world.getBlockMaterial(n6, n7, n8) != enumCreatureType.getCreatureMaterial())
+				if (world.isBlockOpaqueCube(n6, n7, n8)
+						|| world.getBlockMaterial(n6, n7, n8) != enumCreatureType.getCreatureMaterial())
 					continue;
 				int n9 = 0;
 				for (int i = 0; i < 3; ++i) {
@@ -75,8 +77,8 @@ public final class SpawnerAnimals {
 								n10 += world.rand.nextInt(n13) - world.rand.nextInt(n13),
 								n11 += world.rand.nextInt(1) - world.rand.nextInt(1),
 								n12 += world.rand.nextInt(n13) - world.rand.nextInt(n13))
-								|| world.getClosestPlayer(f7 = (float) n10 + 0.5f, f6 = (float) n11, f5 = (float) n12 + 0.5f,
-										24.0) != null
+								|| world.getClosestPlayer(f7 = (float) n10 + 0.5f, f6 = (float) n11,
+										f5 = (float) n12 + 0.5f, 24.0) != null
 								|| (f4 = (f3 = f7 - (float) ((ChunkCoordinates) object).field_22395_a) * f3
 										+ (f2 = f6 - (float) ((ChunkCoordinates) object).field_22394_b) * f2
 										+ (f = f5 - (float) ((ChunkCoordinates) object).field_22396_c) * f) < 576.0f)
@@ -124,7 +126,7 @@ public final class SpawnerAnimals {
 	public static boolean func_22390_a(World world, List list) {
 		boolean bl = false;
 		Pathfinder pathfinder = new Pathfinder(world);
-		for (EntityPlayer entityPlayer : (List<EntityPlayer>)list) {
+		for (EntityPlayer entityPlayer : (List<EntityPlayer>) list) {
 			Class[] classArray = field_22391_a;
 			if (classArray == null || classArray.length == 0)
 				continue;
@@ -133,12 +135,9 @@ public final class SpawnerAnimals {
 				PathEntity pathEntity;
 				EntityLiving entityLiving;
 				int n;
-				int n2 = MathHelper.floor_double(entityPlayer.posX) + world.rand.nextInt(32)
-						- world.rand.nextInt(32);
-				int n3 = MathHelper.floor_double(entityPlayer.posY) + world.rand.nextInt(32)
-						- world.rand.nextInt(32);
-				int n4 = MathHelper.floor_double(entityPlayer.posZ) + world.rand.nextInt(16)
-						- world.rand.nextInt(16);
+				int n2 = MathHelper.floor_double(entityPlayer.posX) + world.rand.nextInt(32) - world.rand.nextInt(32);
+				int n3 = MathHelper.floor_double(entityPlayer.posY) + world.rand.nextInt(32) - world.rand.nextInt(32);
+				int n4 = MathHelper.floor_double(entityPlayer.posZ) + world.rand.nextInt(16) - world.rand.nextInt(16);
 				if (n4 < 1) {
 					n4 = 1;
 				} else if (n4 > 128) {
@@ -175,11 +174,10 @@ public final class SpawnerAnimals {
 						|| !(Math.abs((double) pathPoint.zCoord - entityPlayer.posZ) < 1.5))
 					continue;
 				ChunkCoordinates chunkCoordinates = BlockBed.func_22028_g(world,
-						MathHelper.floor_double(entityPlayer.posX),
-						MathHelper.floor_double(entityPlayer.posY),
+						MathHelper.floor_double(entityPlayer.posX), MathHelper.floor_double(entityPlayer.posY),
 						MathHelper.floor_double(entityPlayer.posZ), 1);
-				entityLiving.setLocationAndAngles((float) chunkCoordinates.field_22395_a + 0.5f, chunkCoordinates.field_22394_b,
-						(float) chunkCoordinates.field_22396_c + 0.5f, 0.0f, 0.0f);
+				entityLiving.setLocationAndAngles((float) chunkCoordinates.field_22395_a + 0.5f,
+						chunkCoordinates.field_22394_b, (float) chunkCoordinates.field_22396_c + 0.5f, 0.0f, 0.0f);
 				world.entityJoinedWorld(entityLiving);
 				SpawnerAnimals.func_21204_a(entityLiving, world, (float) chunkCoordinates.field_22395_a + 0.5f,
 						chunkCoordinates.field_22394_b, (float) chunkCoordinates.field_22396_c + 0.5f);

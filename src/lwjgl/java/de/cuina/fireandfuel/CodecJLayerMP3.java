@@ -44,29 +44,26 @@ import paulscode.sound.SoundSystemLogger;
  * http://www.javazoom.net/javalayer/javalayer.html and Tritonus library from
  * http://www.tritonus.org/.
  * 
- * JLayer, mp3spi and Tritonus library are released under the conditions of 
- * GNU Library General Public License version 2 or (at your option) 
- * any later version of the License.
- * </b><br>
+ * JLayer, mp3spi and Tritonus library are released under the conditions of GNU
+ * Library General Public License version 2 or (at your option) any later
+ * version of the License. </b><br>
  */
 
-public class CodecJLayerMP3 implements ICodec
-{
+public class CodecJLayerMP3 implements ICodec {
 	/**
-	 * Used to return a current value from one of the synchronized
-	 * boolean-interface methods.
+	 * Used to return a current value from one of the synchronized boolean-interface
+	 * methods.
 	 */
 	private static final boolean GET = false;
 
 	/**
-	 * Used to set the value in one of the synchronized boolean-interface
-	 * methods.
+	 * Used to set the value in one of the synchronized boolean-interface methods.
 	 */
 	private static final boolean SET = true;
 
 	/**
-	 * Used when a parameter for one of the synchronized boolean-interface
-	 * methods is not applicable.
+	 * Used when a parameter for one of the synchronized boolean-interface methods
+	 * is not applicable.
 	 */
 	private static final boolean XXX = false;
 
@@ -101,30 +98,25 @@ public class CodecJLayerMP3 implements ICodec
 	 */
 	private SoundSystemLogger logger;
 
-	public CodecJLayerMP3()
-	{
+	public CodecJLayerMP3() {
 		logger = SoundSystemConfig.getLogger();
 	}
 
 	@Override
-	public void reverseByteOrder(boolean b)
-	{
+	public void reverseByteOrder(boolean b) {
 	}
 
 	@Override
-	public boolean initialize(URL url)
-	{
+	public boolean initialize(URL url) {
 		initialized(SET, false);
 		cleanup();
-		if(url == null)
-		{
+		if (url == null) {
 			errorMessage("url null in method 'initialize'");
 			cleanup();
 			return false;
 		}
 
-		try
-		{
+		try {
 			bitstream = new Bitstream(new BufferedInputStream(url.openStream()));
 			decoder = new Decoder();
 
@@ -134,34 +126,32 @@ public class CodecJLayerMP3 implements ICodec
 			decoder.setOutputBuffer(buffer);
 
 			int channels;
-			if(mainHeader.mode() < 3)
+			if (mainHeader.mode() < 3)
 				channels = 2;
-			else channels = 1;
+			else
+				channels = 1;
 
 			bitstream.closeFrame();
 			bitstream.close();
 
-			myAudioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,
-					mainHeader.frequency(), 16, channels, channels * 2, mainHeader.frequency(),
-					false);
+			myAudioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, mainHeader.frequency(), 16, channels,
+					channels * 2, mainHeader.frequency(), false);
 
-			AudioFormat mpegAudioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, -1.0f,
-					16, channels, channels * 2, -1.0f, false);
+			AudioFormat mpegAudioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, -1.0f, 16, channels,
+					channels * 2, -1.0f, false);
 
 			myAudioInputStream = new DecodedMpegAudioInputStream(myAudioFormat,
-					new AudioInputStream(new BufferedInputStream(url.openStream()),
-							mpegAudioFormat, -1));
-			myAudioInputStream.skip((int)(myAudioInputStream.getFormat().getFrameRate() * 0.018f) * myAudioInputStream.getFormat().getFrameSize());
-		} catch (Exception e)
-		{
+					new AudioInputStream(new BufferedInputStream(url.openStream()), mpegAudioFormat, -1));
+			myAudioInputStream.skip((int) (myAudioInputStream.getFormat().getFrameRate() * 0.018f)
+					* myAudioInputStream.getFormat().getFrameSize());
+		} catch (Exception e) {
 			errorMessage("Unable to set up input streams in method " + "'initialize'");
 			printStackTrace(e);
 			cleanup();
 			return false;
 		}
 
-		if(myAudioInputStream == null)
-		{
+		if (myAudioInputStream == null) {
 			errorMessage("Unable to set up audio input stream in method " + "'initialize'");
 			cleanup();
 			return false;
@@ -173,16 +163,13 @@ public class CodecJLayerMP3 implements ICodec
 	}
 
 	@Override
-	public boolean initialized()
-	{
+	public boolean initialized() {
 		return initialized(GET, XXX);
 	}
 
 	@Override
-	public SoundBuffer read()
-	{
-		if(myAudioInputStream == null)
-		{
+	public SoundBuffer read() {
+		if (myAudioInputStream == null) {
 			endOfStream(SET, true);
 			return null;
 		}
@@ -191,8 +178,7 @@ public class CodecJLayerMP3 implements ICodec
 		AudioFormat audioFormat = myAudioInputStream.getFormat();
 
 		// Check to make sure there is an audio format:
-		if(audioFormat == null)
-		{
+		if (audioFormat == null) {
 			errorMessage("Audio Format null in method 'read'");
 			endOfStream(SET, true);
 			return null;
@@ -204,42 +190,34 @@ public class CodecJLayerMP3 implements ICodec
 		// Allocate memory for the audio data:
 		byte[] streamBuffer = new byte[SoundSystemConfig.getStreamingBufferSize()];
 
-		try
-		{
+		try {
 			// Read until buffer is full or end of stream is reached:
-			while((!endOfStream(GET, XXX)) && (bytesRead < streamBuffer.length))
-			{
+			while ((!endOfStream(GET, XXX)) && (bytesRead < streamBuffer.length)) {
 				myAudioInputStream.execute();
-				if((cnt = myAudioInputStream.read(streamBuffer, bytesRead, streamBuffer.length
-						- bytesRead)) < 0)
-				{
+				if ((cnt = myAudioInputStream.read(streamBuffer, bytesRead, streamBuffer.length - bytesRead)) < 0) {
 					endOfStream(SET, true);
 					break;
 				}
 				// keep track of how many bytes were read:
 				bytesRead += cnt;
 			}
-		} catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 
 			/*
 			 * errorMessage( "Exception thrown while reading from the " +
-			 * "AudioInputStream (location #3)." ); printStackTrace( e ); return
-			 * null;
+			 * "AudioInputStream (location #3)." ); printStackTrace( e ); return null;
 			 */// TODO: Figure out why this exceptions is being thrown at end of
 				// MP3 files!
 			endOfStream(SET, true);
 			return null;
-		} catch (ArrayIndexOutOfBoundsException e)
-		{
-			//this exception is thrown at the end of the mp3's
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// this exception is thrown at the end of the mp3's
 			endOfStream(SET, true);
 			return null;
-        }
+		}
 
 		// Return null if no data was read:
-		if(bytesRead <= 0)
-		{
+		if (bytesRead <= 0) {
 			endOfStream(SET, true);
 			return null;
 		}
@@ -256,11 +234,9 @@ public class CodecJLayerMP3 implements ICodec
 	}
 
 	@Override
-	public SoundBuffer readAll()
-	{
+	public SoundBuffer readAll() {
 		// Check to make sure there is an audio format:
-		if(myAudioFormat == null)
-		{
+		if (myAudioFormat == null) {
 			errorMessage("Audio Format null in method 'readAll'");
 			return null;
 		}
@@ -271,30 +247,23 @@ public class CodecJLayerMP3 implements ICodec
 		// Determine how much data will be read in:
 		int fileSize = myAudioFormat.getChannels() * (int) myAudioInputStream.getFrameLength()
 				* myAudioFormat.getSampleSizeInBits() / 8;
-		if(fileSize > 0)
-		{
+		if (fileSize > 0) {
 			// Allocate memory for the audio data:
-			fullBuffer = new byte[myAudioFormat.getChannels()
-					* (int) myAudioInputStream.getFrameLength()
+			fullBuffer = new byte[myAudioFormat.getChannels() * (int) myAudioInputStream.getFrameLength()
 					* myAudioFormat.getSampleSizeInBits() / 8];
 			int read = 0, total = 0;
-			try
-			{
+			try {
 				// Read until the end of the stream is reached:
-				while((read = myAudioInputStream.read(fullBuffer, total, fullBuffer.length - total)) != -1
-						&& total < fullBuffer.length)
-				{
+				while ((read = myAudioInputStream.read(fullBuffer, total, fullBuffer.length - total)) != -1
+						&& total < fullBuffer.length) {
 					total += read;
 				}
-			} catch (IOException e)
-			{
-				errorMessage("Exception thrown while reading from the "
-						+ "AudioInputStream (location #1).");
+			} catch (IOException e) {
+				errorMessage("Exception thrown while reading from the " + "AudioInputStream (location #1).");
 				printStackTrace(e);
 				return null;
 			}
-		} else
-		{
+		} else {
 			// Total file size unknown.
 
 			// Variables used when reading from the audio input stream:
@@ -305,29 +274,23 @@ public class CodecJLayerMP3 implements ICodec
 			smallBuffer = new byte[SoundSystemConfig.getFileChunkSize()];
 
 			// Read until end of file or maximum file size is reached:
-			while((!endOfStream(GET, XXX)) && (totalBytes < SoundSystemConfig.getMaxFileSize()))
-			{
+			while ((!endOfStream(GET, XXX)) && (totalBytes < SoundSystemConfig.getMaxFileSize())) {
 				bytesRead = 0;
 				cnt = 0;
 
-				try
-				{
+				try {
 					// Read until small buffer is filled or end of file reached:
-					while(bytesRead < smallBuffer.length)
-					{
+					while (bytesRead < smallBuffer.length) {
 						myAudioInputStream.execute();
-						if((cnt = myAudioInputStream.read(smallBuffer, bytesRead,
-								smallBuffer.length - bytesRead)) < 0)
-						{
+						if ((cnt = myAudioInputStream.read(smallBuffer, bytesRead,
+								smallBuffer.length - bytesRead)) < 0) {
 							endOfStream(SET, true);
 							break;
 						}
 						bytesRead += cnt;
 					}
-				} catch (IOException e)
-				{
-					errorMessage("Exception thrown while reading from the "
-							+ "AudioInputStream (location #2).");
+				} catch (IOException e) {
+					errorMessage("Exception thrown while reading from the " + "AudioInputStream (location #2).");
 					printStackTrace(e);
 					return null;
 				}
@@ -352,11 +315,9 @@ public class CodecJLayerMP3 implements ICodec
 		SoundBuffer soundBuffer = new SoundBuffer(fullBuffer, myAudioFormat);
 
 		// Close the audio input stream
-		try
-		{
+		try {
 			myAudioInputStream.close();
-		} catch (IOException e)
-		{
+		} catch (IOException e) {
 		}
 
 		// Return the result:
@@ -364,41 +325,33 @@ public class CodecJLayerMP3 implements ICodec
 	}
 
 	@Override
-	public boolean endOfStream()
-	{
+	public boolean endOfStream() {
 		return endOfStream(GET, XXX);
 	}
 
 	@Override
-	public void cleanup()
-	{
-		if(myAudioInputStream != null)
-			try
-			{
+	public void cleanup() {
+		if (myAudioInputStream != null)
+			try {
 				myAudioInputStream.close();
-			} catch (Exception e)
-			{
+			} catch (Exception e) {
 			}
 	}
 
 	@Override
-	public AudioFormat getAudioFormat()
-	{
+	public AudioFormat getAudioFormat() {
 		return myAudioFormat;
 	}
 
 	/**
 	 * Internal method for synchronizing access to the boolean 'initialized'.
 	 * 
-	 * @param action
-	 *            GET or SET.
-	 * @param value
-	 *            New value if action == SET, or XXX if action == GET.
+	 * @param action GET or SET.
+	 * @param value  New value if action == SET, or XXX if action == GET.
 	 * @return True if steam is initialized.
 	 */
-	private synchronized boolean initialized(boolean action, boolean value)
-	{
-		if(action == SET)
+	private synchronized boolean initialized(boolean action, boolean value) {
+		if (action == SET)
 			initialized = value;
 		return initialized;
 	}
@@ -406,15 +359,12 @@ public class CodecJLayerMP3 implements ICodec
 	/**
 	 * Internal method for synchronizing access to the boolean 'endOfStream'.
 	 * 
-	 * @param action
-	 *            GET or SET.
-	 * @param value
-	 *            New value if action == SET, or XXX if action == GET.
+	 * @param action GET or SET.
+	 * @param value  New value if action == SET, or XXX if action == GET.
 	 * @return True if end of stream was reached.
 	 */
-	private synchronized boolean endOfStream(boolean action, boolean value)
-	{
-		if(action == SET)
+	private synchronized boolean endOfStream(boolean action, boolean value) {
+		if (action == SET)
 			endOfStream = value;
 		return endOfStream;
 	}
@@ -422,31 +372,23 @@ public class CodecJLayerMP3 implements ICodec
 	/**
 	 * Reverse-orders all bytes contained in the specified array.
 	 * 
-	 * @param buffer
-	 *            Array containing audio data.
+	 * @param buffer Array containing audio data.
 	 */
-	public static void reverseBytes(byte[] buffer)
-	{
+	public static void reverseBytes(byte[] buffer) {
 		reverseBytes(buffer, 0, buffer.length);
 	}
 
 	/**
-	 * Reverse-orders the specified range of bytes contained in the specified
-	 * array.
+	 * Reverse-orders the specified range of bytes contained in the specified array.
 	 * 
-	 * @param buffer
-	 *            Array containing audio data.
-	 * @param offset
-	 *            Array index to begin.
-	 * @param size
-	 *            number of bytes to reverse-order.
+	 * @param buffer Array containing audio data.
+	 * @param offset Array index to begin.
+	 * @param size   number of bytes to reverse-order.
 	 */
-	public static void reverseBytes(byte[] buffer, int offset, int size)
-	{
+	public static void reverseBytes(byte[] buffer, int offset, int size) {
 
 		byte b;
-		for(int i = offset; i < (offset + size); i += 2)
-		{
+		for (int i = offset; i < (offset + size); i += 2) {
 			b = buffer[i];
 			buffer[i] = buffer[i + 1];
 			buffer[i + 1] = b;
@@ -456,60 +398,48 @@ public class CodecJLayerMP3 implements ICodec
 	/**
 	 * Prints an error message.
 	 * 
-	 * @param message
-	 *            Message to print.
+	 * @param message Message to print.
 	 */
-	private void errorMessage(String message)
-	{
+	private void errorMessage(String message) {
 		logger.errorMessage("CodecJLayerMP3", message, 0);
 	}
 
 	/**
 	 * Prints an exception's error message followed by the stack trace.
 	 * 
-	 * @param e
-	 *            Exception containing the information to print.
+	 * @param e Exception containing the information to print.
 	 */
-	private void printStackTrace(Exception e)
-	{
+	private void printStackTrace(Exception e) {
 		logger.printStackTrace(e, 1);
 	}
 
 	/**
-	 * Creates a new array with the second array appended to the end of the
-	 * first array.
+	 * Creates a new array with the second array appended to the end of the first
+	 * array.
 	 * 
-	 * @param arrayOne
-	 *            The first array.
-	 * @param arrayTwo
-	 *            The second array.
-	 * @param length
-	 *            How many bytes to append from the second array.
+	 * @param arrayOne The first array.
+	 * @param arrayTwo The second array.
+	 * @param length   How many bytes to append from the second array.
 	 * @return Byte array containing information from both arrays.
 	 */
-	private static byte[] appendByteArrays(byte[] arrayOne, byte[] arrayTwo, int length)
-	{
+	private static byte[] appendByteArrays(byte[] arrayOne, byte[] arrayTwo, int length) {
 		byte[] newArray;
-		if(arrayOne == null && arrayTwo == null)
-		{
+		if (arrayOne == null && arrayTwo == null) {
 			// no data, just return
 			return null;
-		} else if(arrayOne == null)
-		{
+		} else if (arrayOne == null) {
 			// create the new array, same length as arrayTwo:
 			newArray = new byte[length];
 			// fill the new array with the contents of arrayTwo:
 			System.arraycopy(arrayTwo, 0, newArray, 0, length);
 			arrayTwo = null;
-		} else if(arrayTwo == null)
-		{
+		} else if (arrayTwo == null) {
 			// create the new array, same length as arrayOne:
 			newArray = new byte[arrayOne.length];
 			// fill the new array with the contents of arrayOne:
 			System.arraycopy(arrayOne, 0, newArray, 0, arrayOne.length);
 			arrayOne = null;
-		} else
-		{
+		} else {
 			// create the new array large enough to hold both arrays:
 			newArray = new byte[arrayOne.length + length];
 			System.arraycopy(arrayOne, 0, newArray, 0, arrayOne.length);
@@ -522,27 +452,23 @@ public class CodecJLayerMP3 implements ICodec
 		return newArray;
 	}
 
-	private static class DMAISObuffer extends Obuffer
-	{
+	private static class DMAISObuffer extends Obuffer {
 		private int m_nChannels;
 		private byte[] m_abBuffer;
 		private int[] m_anBufferPointers;
 		private boolean m_bIsBigEndian;
 
-		public DMAISObuffer(int nChannels)
-		{
+		public DMAISObuffer(int nChannels) {
 			m_nChannels = nChannels;
 			m_abBuffer = new byte[OBUFFERSIZE * nChannels];
 			m_anBufferPointers = new int[nChannels];
 			reset();
 		}
 
-		public void append(int nChannel, short sValue)
-		{
+		public void append(int nChannel, short sValue) {
 			byte bFirstByte;
 			byte bSecondByte;
-			if(m_bIsBigEndian)
-			{
+			if (m_bIsBigEndian) {
 				bFirstByte = (byte) ((sValue >>> 8) & 0xFF);
 				bSecondByte = (byte) (sValue & 0xFF);
 			} else
@@ -556,26 +482,20 @@ public class CodecJLayerMP3 implements ICodec
 			m_anBufferPointers[nChannel] += m_nChannels * 2;
 		}
 
-		public void set_stop_flag()
-		{
+		public void set_stop_flag() {
 		}
 
-		public void close()
-		{
+		public void close() {
 		}
 
-		public void write_buffer(int nValue)
-		{
+		public void write_buffer(int nValue) {
 		}
 
-		public void clear_buffer()
-		{
+		public void clear_buffer() {
 		}
 
-		public void reset()
-		{
-			for(int i = 0; i < m_nChannels; i++)
-			{
+		public void reset() {
+			for (int i = 0; i < m_nChannels; i++) {
 				/*
 				 * Points to byte location, implicitly assuming 16 bit samples.
 				 */

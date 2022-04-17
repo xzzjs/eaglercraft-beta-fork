@@ -51,16 +51,15 @@ public class CompatEnum<E extends CompatEnum<E>> {
 	}
 
 	/**
-	* Sole constructor.  Programmers cannot invoke this constructor.
-	* It is for use by code emitted by the compiler in response to
-	* enum type declarations.
-	*
-	* @param name - The name of this enum constant, which is the identifier
-	*               used to declare it.
-	* @param ordinal - The ordinal of this enumeration constant (its position
-	*         in the enum declaration, where the initial constant is assigned
-	*         an ordinal of zero).
-	*/
+	 * Sole constructor. Programmers cannot invoke this constructor. It is for use
+	 * by code emitted by the compiler in response to enum type declarations.
+	 *
+	 * @param name    - The name of this enum constant, which is the identifier used
+	 *                to declare it.
+	 * @param ordinal - The ordinal of this enumeration constant (its position in
+	 *                the enum declaration, where the initial constant is assigned
+	 *                an ordinal of zero).
+	 */
 	protected CompatEnum(String name, int ordinal) {
 		this.name = name;
 		this.ordinal = ordinal;
@@ -148,12 +147,12 @@ public class CompatEnum<E extends CompatEnum<E>> {
 	 */
 	public static <T extends CompatEnum<T>> T valueOf(Class<T> enumType, String name) {
 		try {
-			T result = (T)enumType.getField(name).get(null);
+			T result = (T) enumType.getField(name).get(null);
 			if (result != null)
 				return result;
 			if (name == null)
 				throw new NullPointerException("Name is null");
-		}catch(IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ee) {
+		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ee) {
 		}
 		throw new IllegalArgumentException("No enum constant " + enumType.getCanonicalName() + "." + name);
 	}

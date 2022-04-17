@@ -33,15 +33,15 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RUNTIME)
-@Target({METHOD})
+@Target({ METHOD })
 /**
- * Use this annotation on a getter method to override the Bean name
- * parser for Bean -&gt; JSONObject mapping. A value set to empty string <code>""</code>
+ * Use this annotation on a getter method to override the Bean name parser for
+ * Bean -&gt; JSONObject mapping. A value set to empty string <code>""</code>
  * will have the Bean parser fall back to the default field name processing.
  */
 public @interface JSONPropertyName {
-    /**
-     * @return The name of the property as to be used in the JSON Object.
-     */
-    String value();
+	/**
+	 * @return The name of the property as to be used in the JSON Object.
+	 */
+	String value();
 }
